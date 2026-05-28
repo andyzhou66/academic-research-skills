@@ -48,12 +48,12 @@ Note R1-1 split into two commitments — compound comments decompose per Step 3.
 - concern_id: R1-1
   revision_location: "§4.3 Table 4; §5.2 ¶3"
   fulfillment_status: [fulfilled, fulfilled]
-  unfulfilled_rationale: []
+  unfulfilled_rationale: ["", ""]
 
 - concern_id: R1-2
   revision_location: "§5.4 ¶1"
   fulfillment_status: [fulfilled]
-  unfulfilled_rationale: []
+  unfulfilled_rationale: [""]
 
 - concern_id: R1-3
   revision_location: "§4.3 Table 4 footnote"
@@ -77,7 +77,7 @@ If R1-3 instead had:
 - concern_id: R1-3
   revision_location: "§4.3 Table 4"
   fulfillment_status: [not-fulfilled]
-  unfulfilled_rationale: []
+  unfulfilled_rationale: [""]  # empty string at index 0 — Schema 11 validation flags this
 ```
 
 …the re-reviewer would surface:
