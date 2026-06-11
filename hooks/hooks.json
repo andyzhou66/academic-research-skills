@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "C:\\Program Files\\Python311\\python.exe \"${CLAUDE_PLUGIN_ROOT}/scripts/ars_write_scope_guard.py\""
+            "command": "\"C:\\Program Files\\Python311\\python.exe\" \"${CLAUDE_PLUGIN_ROOT}/scripts/ars_write_scope_guard.py\""
           }
         ]
       }
