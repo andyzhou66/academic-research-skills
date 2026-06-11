@@ -171,6 +171,14 @@ Ready to proceed to Stage [Y]? You can also:
 2. Adjust settings
 3. Pause pipeline
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<!-- IF ARS_PASSPORT_RESET=1: APPEND BELOW BEFORE PRESENTING TO USER -->
+
+[PASSPORT-RESET: hash=<12-char-sha256>, stage=<completed>, next=<next>]
+
+### Resume Instruction
+To resume in a fresh session: resume_from_passport=<hash>
+Passport file: output/material_passport.yaml
 ```
 
 ### Adaptive Rules
@@ -199,6 +207,13 @@ Before presenting the checkpoint to the user, the orchestrator asks itself:
 3. **Quality trajectory**: Is the latest output ≥ the quality of the previous stage? If declining, PAUSE and flag.
 4. **Scope discipline**: Did the latest stage add content not requested by the user or the revision roadmap?
 5. **Completeness**: Are all required deliverables for this stage present?
+6. **Passport boundary (ARS_PASSPORT_RESET=1 only):** Has `state_tracker_agent` been called
+   to freeze state? Has the `kind: boundary` entry been serialized, hashed (SHA-256 of RFC 8785
+   canonical JSON, first 12 hex chars), and appended to `output/material_passport.yaml`?
+   Has the `[PASSPORT-RESET: hash=..., stage=..., next=...]` tag been emitted in the checkpoint block?
+   If flag is ON and any answer is NO → STOP, execute the protocol per
+   `references/passport_as_reset_boundary.md` § "The reset boundary protocol" steps 1–5,
+   then present the checkpoint.
 
 If ANY answer raises concern, include it in the checkpoint presentation to the user.
 
@@ -264,8 +279,20 @@ Call the corresponding skill (does not do work itself, purely dispatching):
 
 After completion:
 1. Compile deliverables list
-2. Update pipeline state (call state_tracker_agent)
-3. [MANDATORY] Proactively prompt checkpoint, wait for user confirmation
+2. **Dispatch `state_tracker_agent`** to freeze state and record deliverables
+   (stage, version_label, mode, verification_status, deliverables[]).
+   ⚠️ **If `ARS_PASSPORT_RESET=1`:** state_tracker MUST also prepare the
+   `kind: boundary` ledger entry. The orchestrator then:
+   a. Serializes the entry as RFC 8785 canonical JSON with `hash: "000000000000"`
+   b. Computes SHA-256 over (all prior boundary entries + new entry), takes
+      first 12 lowercase hex chars as the entry's `hash`
+   c. Overwrites the placeholder and appends to `output/material_passport.yaml`
+   d. Includes the `[PASSPORT-RESET: hash=..., stage=..., next=...]` tag and
+      `### Resume Instruction` in the checkpoint block (see Decision Dashboard)
+   See `references/passport_as_reset_boundary.md` § step 2 for canonical byte
+   serialization.
+3. [MANDATORY] Present checkpoint (including passport tag + resume instruction
+   if flag ON), wait for user confirmation.
 ```
 
 ### Step 4: TRANSITION
