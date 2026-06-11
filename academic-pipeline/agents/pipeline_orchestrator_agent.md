@@ -176,7 +176,7 @@ consecutive_continue_count: integer (reset to 0 when user chooses any action oth
 
 #### Passport Reset Boundary (v3.6.3+, opt-in)
 
-**Flag:** `ARS_PASSPORT_RESET=1`. When unset or `=0`, all behavior below is skipped and pre-v3.6.3 continuation semantics apply exactly.
+**Flag:** `ARS_PASSPORT_RESET=1`. **Detection (in precedence order):** (a) If the user's first message contains the literal string `ARS_PASSPORT_RESET=1` (case-sensitive), treat the flag as ON. (b) Otherwise, check the environment variable `ARS_PASSPORT_RESET` — if it equals `1`, treat the flag as ON. (c) Otherwise, the flag is OFF. When OFF, all behavior below is skipped and pre-v3.6.3 continuation semantics apply exactly.
 
 **Applicability:**
 
